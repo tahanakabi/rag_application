@@ -1,0 +1,37 @@
+# --- Core ---
+numpy>=1.24
+pandas>=2.0
+pydantic-settings>=2.0
+python-dotenv>=1.0
+tqdm>=4.66
+
+# --- Embeddings / models ---
+sentence-transformers>=3.0
+transformers>=4.41
+torch>=2.2
+tiktoken>=0.7
+
+# --- Vector stores ---
+faiss-cpu>=1.8
+
+# --- Sparse / hybrid retrieval ---
+rank-bm25>=0.2.2
+
+# --- OCR for embedded base64 images ---
+pytesseract>=0.3.10    # requires system package: tesseract-ocr
+Pillow>=10.0
+# easyocr>=1.7         # optional heavier fallback (uncomment if needed)
+
+# --- LLMs ---
+openai>=1.30
+llama-cpp-python>=0.2.79   # runs small GGUF quantized models on CPU
+huggingface-hub>=0.23
+
+# --- Experiment tracking & evaluation ---
+mlflow==2.13
+ragas>=0.1.7           # optional; generation metrics fall back to custom if absent
+datasets>=2.19
+
+# --- Optional UI ---
+streamlit>=1.35
+
