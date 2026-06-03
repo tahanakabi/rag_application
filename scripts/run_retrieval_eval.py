@@ -45,7 +45,7 @@ def main() -> None:
         settings, chunks, embedder, store, full_vectors=vectors
     )
 
-    mlflow.set_tracking_uri(settings.mlflow_uri)
+    mlflow.set_tracking_uri("http://localhost:5000")
     mlflow.set_experiment("faq_retrieval")
 
     print(f"\n{'retriever':<14} hit_at_k   mrr     recall  ndcg")
@@ -67,7 +67,7 @@ def main() -> None:
             f"{metrics.recall_at_k:.3f}   {metrics.ndcg_at_k:.3f}"
         )
 
-    print(f"\nMLflow runs logged to {settings.mlflow_uri}")
+    print(f"\nMLflow runs logged to http://localhost:5000")
 
 
 if __name__ == "__main__":

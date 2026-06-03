@@ -80,7 +80,7 @@ def main() -> None:
 
     metrics = evaluate_generation(samples, openai_api_key=settings.openai_api_key)
 
-    mlflow.set_tracking_uri(settings.mlflow_uri)
+    mlflow.set_tracking_uri("http://localhost:5000")
     mlflow.set_experiment("faq_generation")
     with mlflow.start_run(run_name=f"{args.backend}_{args.retriever}"):
         mlflow.log_params(
@@ -95,7 +95,7 @@ def main() -> None:
         mlflow.log_metrics(metrics)
 
     print("Generation metrics:", metrics)
-    print(f"MLflow runs logged to {settings.mlflow_uri}")
+    print(f"MLflow runs logged to http://localhost:5000")
 
 
 if __name__ == "__main__":

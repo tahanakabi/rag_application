@@ -45,51 +45,59 @@ scripts/
 ## Setup
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
+uv venv
+source .venv/bin/activate
+uv pip install -r requirements.txt
 
 # system dependency for OCR (Debian/Ubuntu)
 sudo apt-get install -y tesseract-ocr
 
-cp .env.example .env   # then add your OPENAI_API_KEY
 ```
-
+Create a `.env` file (see `.env.example`) with your OpenAI API key and desired model names. The default embedding and reranking models are small and run on CPU
+by default, but will use the GPU if available (`DEVICE=auto`); you can also force a specific device with `DEVICE=cuda`, `DEVICE=mps` or `DEVICE=cpu`.
 ## Usage
 
 ### 1. Ingestion (chunking, OCR, embedding, vector DBs)
 ```bash
-python -m scripts.run_ingest
+uv run scripts/run_ingest.py
 ```
 Builds Q/A chunks (long answers split with the question preserved as context),
 OCRs embedded base64 images, then stores embeddings in **FAISS** (in-memory,
 persisted to disk).
 
 ### 2. Retrieval experiments (3 approaches + metrics)
+Start an Mlflow server:
+
 ```bash
-python -m scripts.run_retrieval_eval --k 5
+mlflow server \                                
+    --backend-store-uri sqlite:///mlflow.db \           
+    --default-artifact-root ./artifacts \                               
+    --host 0.0.0.0
+ ```
+
+```bash
+uv run scripts/run_retrieval_eval.py
 ```
 Evaluates **dense**, **hybrid (RRF)** and **cross-encoder rerank** retrievers.
 Metrics tracked: **Hit@k**, **MRR**, **Recall@k**,
-**nDCG@k**. View runs:
-```bash
-mlflow ui --backend-store-uri data/mlruns
-```
+**nDCG@k**. 
 
+View runs at localhost:5000 to compare retriever performance. The best retriever (likely
 ### 3. RAG application + generation metrics
 ```bash
 # OpenAI backend
-python -m scripts.run_generation_eval --backend openai --retriever rerank
+uv run scripts/run_generation_eval.py --backend openai --retriever rerank
 
-# Small quantized local model (Qwen2.5-3B-Instruct GGUF)
-python -m scripts.run_generation_eval --backend local --retriever rerank
+# Small quantized local model (tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf)
+uv run scripts/run_generation_eval.py --backend local --retriever rerank
 ```
 Generation metrics (faithfulness, answer relevancy, context precision via
 **ragas**; lexical proxies if ragas/judge LLM unavailable) are logged to MLflow.
 
 ### Chat interactively
 ```bash
-python -m faq_rag.app --backend openai --retriever rerank   # CLI
-streamlit run faq_rag/app.py                                # web UI
+uv run faq_rag/app.py --backend openai --retriever rerank   # CLI
+uv run streamlit run faq_rag/app.py                                # web UI
 ```
 
 ## Design notes / choices
